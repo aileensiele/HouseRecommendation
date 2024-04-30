@@ -1,117 +1,90 @@
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-
-df = pd.read_csv('synthetic_house_recommendation_data.csv')
-
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-
-
-# Assuming 'df' is your DataFrame
-# Columns to be one-hot encoded
-categorical_columns = ['house_type', 'neighbourhood_quality', 'house_condition', 'crime_rate']
-
-# Set up OneHotEncoder and ColumnTransformer
-encoder = OneHotEncoder()
-transformer = ColumnTransformer([
-    ("one_hot", encoder, categorical_columns)
-], remainder='passthrough')
-
-# Apply encoder to the data
-df_encoded_array = transformer.fit_transform(df)
-
-# Accessing categories from the fitted transformer
-# Get the encoder and then the categories
-fitted_encoder = transformer.named_transformers_['one_hot']
-categories = fitted_encoder.categories_
-
-# Creating a flat list of new column names for the categorical variables
-category_mapping = [f"{cat}__{subcat}" for cat, sublist in zip(categorical_columns, categories) for subcat in sublist]
-
-# Get names of columns that were not transformed (passthrough)
-passthrough_indices = [i for i, col in enumerate(df.columns) if col not in categorical_columns]
-passthrough_columns = [df.columns[i] for i in passthrough_indices]
-
-# Combine all column names
-all_columns = category_mapping + passthrough_columns
-
-# Create the DataFrame with the appropriate column names
-df_encoded = pd.DataFrame(df_encoded_array, columns=all_columns)  # Ensure to convert sparse matrix to array
-
-# Check the first few rows of the encoded DataFrame
-print(df_encoded.head())
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# List of numerical features
-numerical_features = ['price', 'bedrooms', 'bathrooms', 'garden_size']
-
-# Sample a subset of the data, say 10% of it
-sample_df = df #sample(frac=0.1)
-
-# Plotting distributions of numerical features on the sample
-fig, ax = plt.subplots(len(numerical_features), 1, figsize=(8, 4 * len(numerical_features)))
-for i, feature in enumerate(numerical_features):
-    sns.histplot(sample_df[feature], kde=True, ax=ax[i])
-    ax[i].set_title(f'Distribution of {feature}')
-    ax[i].set_xlabel('')
-    ax[i].set_ylabel('Frequency')
-
-plt.tight_layout()
-plt.show()
-
-
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
 
+def preprocess_data(df):
+    # One-hot encode categorical variables
+    categorical_columns = ['house_type', 'neighbourhood_quality', 'house_condition', 'crime_rate']
+    encoder = OneHotEncoder()
+    transformer = ColumnTransformer([('one_hot', encoder, categorical_columns)], remainder='passthrough')
+    df_encoded = transformer.fit_transform(df)
+    
+    # Accessing categories from the fitted transformer
+    fitted_encoder = transformer.named_transformers_['one_hot']
+    categories = fitted_encoder.categories_
 
-# Log-transform the 'price' column
-# Assuming 'df' is your DataFrame that includes the 'price' column.
-df_encoded['log_price'] = np.log1p(df['price'])
+    # Creating new column names for the categorical variables
+    category_mapping = [f"{cat}__{subcat}" for cat, sublist in zip(categorical_columns, categories) for subcat in sublist]
 
-# transform the garden size because of extreme right skewness!
-# Visualizing the distribution of the log-transformed garden size
-df_encoded['garden_size'] = df_encoded['garden_size'].replace([np.inf, -np.inf], np.nan).fillna(0)
+    # Get names of columns that were not transformed (passthrough)
+    passthrough_indices = [i for i, col in enumerate(df.columns) if col not in categorical_columns]
+    passthrough_columns = [df.columns[i] for i in passthrough_indices]
 
-# Now apply the log1p transformation
-df_encoded['log_garden_size'] = np.log1p(df_encoded['garden_size'])
+    # Combine all column names
+    all_columns = category_mapping + passthrough_columns
 
-# Visualize the distribution of the log-transformed garden size
-sns.histplot(df_encoded['log_garden_size'], kde=True)
-plt.title('Distribution of Log-transformed Garden Size')
-plt.xlabel('Log(Garden Size)')
-plt.ylabel('Frequency')
-plt.show()
+    # Create the DataFrame with the appropriate column names
+    processed_df = pd.DataFrame(df_encoded, columns=all_columns)
 
+    # Log-transform the 'price' column
+    processed_df['log_price'] = np.log(df['price'])
 
+    # Log-transform the 'garden_size' column if necessary
+    processed_df['log_garden_size'] = np.log(df['garden_size'])
 
+    # Drop unnecessary columns
+    processed_df.drop(columns=['Unnamed: 0', 'price', 'house_keywords', 'garden_size'], inplace=True)
 
-# Convert 'log_price' to numeric, coercing errors to NaN
-df_encoded['log_price'] = pd.to_numeric(df_encoded['log_price'], errors='coerce')
+    return processed_df
 
-# Optionally handle NaN values by replacing them with the mean or median
-df_encoded['log_price'].fillna(df_encoded['log_price'].mean(), inplace=True)
+def train_model(X, y):
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+    model.fit(X, y)
+    return model
 
-# List of columns that are known to be binary (one-hot encoded)
-binary_columns = [
-    'house_type__Bungalow', 'house_type__Detached', 'house_type__Flat', 'house_type__Land', 
-    'house_type__Park Home', 'house_type__Semi-Detached', 'house_type__Terraced',
-    'neighbourhood_quality__Abysmal', 'neighbourhood_quality__Alright', 
-    'neighbourhood_quality__Outstanding', 'neighbourhood_quality__Pleasant', 
-    'neighbourhood_quality__Rough', 'house_condition__Abysmal', 'house_condition__Alright', 
-    'house_condition__Outstanding', 'house_condition__Pleasant', 'house_condition__Rough', 
-    'crime_rate__Extreme', 'crime_rate__High', 'crime_rate__Low', 'crime_rate__Medium', 
-    'crime_rate__Non Existent', 'crime_rate__Very High', 'crime_rate__Very Low'
-]
+def predict_price(user_input, model, column_order):
+    input_df = pd.DataFrame([user_input])
+    input_df = input_df[column_order]
+    predicted_log_price = model.predict(input_df)
+    predicted_price = np.exp(predicted_log_price[0])
+    return predicted_price
 
-# Convert these columns explicitly to integer
-for col in binary_columns:
-    df_encoded[col] = df_encoded[col].astype(int)
+def explanation(model):
+    return None
 
-# Verify changes
-print(df_encoded[binary_columns].dtypes)
+if __name__ == "__main__":
+    # Load data
+    df = pd.read_csv('synthetic_house_recommendation_data.csv')
+
+    # Preprocess data
+    processed_df = preprocess_data(df)
+
+    # Define features and target variable
+    X = processed_df.drop(columns=['log_price'], axis=1)
+    y = processed_df['log_price']
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Train model
+    model = train_model(X_train, y_train)
+
+    # Make predictions on test set
+    predictions = model.predict(X_test)
+
+    # Calculate Mean Squared Error
+    mse = mean_squared_error(y_test, predictions)
+    print(f'Mean Squared Error: {mse}')
+
+    # Define user input
+    user_input = {
+        # Define user input here
+    }
+
+    # Predict price based on user input
+    predicted_price = predict_price(user_input, model, X_train.columns)
+    print(f'Predicted Price: ${predicted_price:.2f}')
