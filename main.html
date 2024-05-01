@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Recommendation System</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input[type=range] {
+        width: 100%;
+    }
+    .form-group input[type=number],
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #5cb85c;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #4cae4c;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>House Recommendation System</h1>
+    <form id="recommendation-form">
+        <!-- Bedroom input -->
+        <div class="form-group">
+            <label for="bedrooms">Bedrooms:</label>
+            <select id="bedrooms" name="bedrooms">
+                <option value="Select">Select</option>
+                <option value="1">1 Bedroom</option>
+                <option value="2">2 Bedrooms</option>
+                <option value="3">3 Bedrooms</option>
+                <option value="4">4 Bedrooms</option>
+                <option value="5">5 Bedrooms</option>
+            </select>
+        </div>
+        <!-- Bathroom input -->
+        <div class="form-group">
+            <label for="bathrooms">Bathrooms:</label>
+            <select id="bathrooms" name="bathrooms">
+                <option value="Select">Select</option>
+                <option value="1">1 Bathroom</option>
+                <option value="2">2 Bathrooms</option>
+                <option value="3">3 Bathrooms</option>
+                <option value="4">4 Bathrooms</option>
+                <option value="5">5 Bathrooms</option>
+            </select>
+        </div>
+
+        <!-- City input -->
+        <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" required>
+        </div>
+
+        <!-- House Type dropdown -->
+        <div class="form-group">
+            <label for="house_type">House Type:</label>
+            <select id="house_type" name="house_type">
+                <option value="Select">Select</option>
+                <option value="Terraced">Terraced</option>
+                <option value="Land">Land</option>
+                <option value="Bungalow">Bungalow</option>
+                <option value="Detached">Detached</option>
+                <option value="Flat">Flat</option>
+                <option value="park_home">Park Home</option>
+            </select>
+        </div>
+
+        <!-- House Condition dropdown -->
+        <div class="form-group">
+            <label for="house_condition">House Condition:</label>
+            <select id="house_condition" name="house_condition">
+                <option value="Select">Select</option>
+                <option value="oustanding">Outstanding</option>
+                <option value="pleasant">Pleasant</option>
+                <option value="alright">Alright</option>
+                <option value="abysmal">Abysmal</option>
+                <option value="rough">Rough</option>
+            </select>
+        </div>
+
+        <!-- Neighborhood dropdown -->
+        <div class="form-group">
+            <label for="neighborhood_quality">Neighborhood Quality:</label>
+            <select id="neighborhood_quality" name="neighborhood_quality">
+                <option value="Select">Select</option>
+                <option value="oustanding">Outstanding</option>
+                <option value="pleasant">Pleasant</option>
+                <option value="alright">Alright</option>
+                <option value="abysmal">Abysmal</option>
+                <option value="rough">Rough</option>
+            </select>
+        </div>
+
+        <!-- Crime Rate dropdown -->
+        <div class="form-group">
+            <label for="crime_rate">Crime Rate:</label>
+            <select id="crime_rate" name="crime_rate">
+                <option value="Select">Select</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="very low">Very Low</option>
+                <option value="very high">Very High</option>
+                <option value="non existent">Non Existent</option>
+                <option value="extreme">Extreme</option>
+            </select>
+        </div>
+
+        <!-- Garden Size input -->
+        <div class="form-group">
+            <label for="garden_size">Garden Size (sqm):</label>
+            <input type="number" id="garden_size" name="garden_size" min="0">
+        </div>
+
+        <!-- Budget -->
+        <div class="form-group">
+            <label for="budget">Budget Range:</label>
+            <input type="range" id="budget" name="budget" min="50000" max="1000000" step="5000">
+            <span id="budgetValue">50000</span>
+        </div>
+
+        <button type="submit">Estimate</button>
+        <button type="submit">Recommend</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('budget').oninput = function() {
+    document.getElementById('budgetValue').textContent = this.value;
+};
+</script>
+
+</body>
+</html>

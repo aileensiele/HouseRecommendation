@@ -147,7 +147,7 @@ def recommend_houses(df, user_preferences, pipeline):
         (df['price'] <= budget) &
         (df['bedrooms'] == complete_preferences['bedrooms']) &
         (df['bathrooms'] == complete_preferences['bathrooms']) &
-        (df['house_type'] == complete_preferences['house_type']) &
+        # (df['house_type'] == complete_preferences['house_type']) &
         (df['city'] == complete_preferences['city'])
     ].head(10)
 
