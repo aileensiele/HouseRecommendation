@@ -106,26 +106,34 @@ def recommend_houses(df, user_preferences, pipeline_clustering):
 
     query = (df['Cluster'] == user_cluster) & (df['price'] <= budget) & (df['city'] == complete_preferences['city'])
     for criterion in strict_criteria:
-        if criterion in complete_preferences:
+        if criterion in complete_preferences and complete_preferences[criterion] is not None:
             query &= (df[criterion] == complete_preferences[criterion])
 
     recommended_houses = df[query].copy()
     recommended_houses['score'] = (recommended_houses['house_type'] == complete_preferences['house_type']).astype(int)
-    recommended_houses = recommended_houses.sort_values(by=['score', 'price'], ascending=[False, True]).head(10)
 
     if recommended_houses.empty:
-        return "No houses found that match your preferences within your budget."
+        recommended_houses = df[(df['price'] <= budget) & (df['city'] == complete_preferences['city'])].copy()
+        recommended_houses['score'] = 0
+
+    if not recommended_houses.empty:
+        # Calculate a new column 'budget_distance' to find houses closer to the upper budget limit
+        recommended_houses['budget_distance'] = budget - recommended_houses['price']
+        recommended_houses = recommended_houses.sort_values(by=['score', 'budget_distance'], ascending=[False, True]).head(10)
     else:
-        return recommended_houses[['bedrooms', 'bathrooms', 'house_type', 'city', 'price', 'score']]
+        return "No houses found in " + complete_preferences['city'] + " within your budget."
+
+    return recommended_houses[['bedrooms', 'bathrooms', 'house_type', 'city', 'price', 'score']]
 
 # Example usage
 df, categorical_cols = load_and_preprocess_data()
 predict_prices(df, categorical_cols)
 pipeline_clustering = perform_clustering(df, categorical_cols)
 user_preferences = {
-    'bedrooms': 3, 'bathrooms': 2, 'city': 'London', 'house_type': 'Terraced', 'budget': 700000,
+    'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
     'strict': ['city', 'bedrooms', 'bathrooms']
 }
 recommended_houses = recommend_houses(df, user_preferences, pipeline_clustering)
 print("Recommended houses based on your preferences:")
 print(recommended_houses)
+
