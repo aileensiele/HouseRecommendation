@@ -152,16 +152,42 @@
             <span id="budgetValue">50000</span>
         </div>
 
-        <button type="submit">Estimate</button>
-        <button type="submit">Recommend</button>
+        <button type="submit" formaction="/quick_estimate">Quick Price Estimate</button>
+        <button type="submit" formaction="/ai_recommender">AI Recommender</button>
+        <button type="submit" formaction="/manual_recommend">Manual Recommendation</button>
     </form>
+    <div id="results">
+        <!-- Results from AJAX calls will be displayed here -->
+    </div>
+    
 </div>
+
 
 <script>
 document.getElementById('budget').oninput = function() {
     document.getElementById('budgetValue').textContent = this.value;
 };
 </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('#recommendation-form').submit(function(event){
+        event.preventDefault(); // Prevent the form from submitting via the browser.
+        var form = $(this);
+        var url = form.attr('action');
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form.serialize(), // serializes the form's elements.
+            success: function(data) {
+                $('#results').html(data); // display the returned data in the HTML element with id="results".
+            }
+        });
+    });
+});
+</script>
+
 
 </body>
 </html>
