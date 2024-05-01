@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
@@ -124,3 +125,7 @@ if __name__ == "__main__":
     
 
     print(f'Predicted Price: ${predicted_price:.2f}')
+    
+    feature_importances = pd.Series(model.feature_importances_, index=X_train.columns)
+    print(feature_importances.nlargest(10).plot(kind='barh'))
+    plt.title('Top 10 Important Features')
