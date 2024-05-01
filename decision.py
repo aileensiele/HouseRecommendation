@@ -125,15 +125,18 @@ def recommend_houses(df, user_preferences, pipeline_clustering):
 
     return recommended_houses[['bedrooms', 'bathrooms', 'house_type', 'city', 'price', 'score']]
 
-# Example usage
-df, categorical_cols = load_and_preprocess_data()
-predict_prices(df, categorical_cols)
-pipeline_clustering = perform_clustering(df, categorical_cols)
-user_preferences = {
-    'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
-    'strict': ['city', 'bedrooms', 'bathrooms']
-}
-recommended_houses = recommend_houses(df, user_preferences, pipeline_clustering)
-print("Recommended houses based on your preferences:")
-print(recommended_houses)
 
+def main():
+    df, categorical_cols = load_and_preprocess_data()
+    predict_prices(df, categorical_cols)
+    pipeline_clustering = perform_clustering(df, categorical_cols)
+    user_preferences = {
+        'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
+        'strict': ['city', 'bedrooms', 'bathrooms']
+    }
+    recommended_houses = recommend_houses(df, user_preferences, pipeline_clustering)
+    print("Recommended houses based on your preferences:")
+    print(recommended_houses)
+
+if __name__ == "__main__":
+    main()
