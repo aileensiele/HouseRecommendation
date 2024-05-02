@@ -26,7 +26,7 @@ To utilize the HouseRecommendation system, please follow the steps outlined belo
    - Install Python (version 3.8 or newer recommended) on your machine.
    - Install all required Python libraries using the following command:
      ```
-     pip install numpy pandas scikit-learn matplotlib seaborn
+     pip install requirements.txt
      ```
 
 2. **Clone the Repository:**
