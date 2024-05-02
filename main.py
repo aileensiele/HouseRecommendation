@@ -100,6 +100,7 @@ def get_ai_recommendations(form_data):
 
 def get_manual_recommendations(data):
     # replace with calling manual rec funct
+    
     return {'result': 'Manually curated recommendations based on rules'}
 
 if __name__ == '__main__':

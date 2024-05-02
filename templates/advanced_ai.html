@@ -91,7 +91,7 @@
             <input type="range" id="budget" name="budget" class="form-control" min="50000" max="1000000" step="5000" oninput="document.getElementById('budgetValue').textContent=this.value">
             <span id="budgetValue">50000</span>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Recommend</button>
     </form>
 	<div id="results" class="mt-4">
         <!-- Results will be displayed here -->
@@ -100,22 +100,45 @@
 </body>
 
 <script>
-	$(document).ready(function() {
-		$('form').submit(function(event) {
-			event.preventDefault(); // Stop the form from causing a page reload.
-			$.ajax({
-				url: $(this).attr('action'),
-				type: 'POST',
-				data: $(this).serialize(), // Send the form data to the server.
-				success: function(response) {
-					$('#results').html( response.explanation + response.recommended_properties ); // Update the results container with response.
-				},
-				error: function() {
-					$('#results').html('Failed to retrieve data.'); // Handle errors here
-				}
-			});
-		});
-	});
+    $(document).ready(function() {
+        $('form').submit(function(event) {
+            event.preventDefault(); // Prevent the default form submission that causes a page reload.
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(), // Serialize the form data.
+                success: function(response) {
+                    var resultsDiv = $('#results');
+                    resultsDiv.empty(); // Clear previous results
+    
+                    if (response.recommended_properties && response.recommended_properties.length > 0) {
+                        var content = '<div class="list-group">';
+                        response.recommended_properties.forEach(function(property) {
+                            content += `<a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                                            <div class="d-flex w-100 justify-content-between">
+                                              <h5 class="mb-1">${property.house_type} - ${property.city}</h5>
+                                              <small>${property.price} USD</small>
+                                            </div>
+                                            <p class="mb-1">Bedrooms: ${property.bedrooms} | Bathrooms: ${property.bathrooms}</p>
+                                            <small>Score: ${property.score}</small>
+                                        </a>`;
+                        });
+                        content += '</div>';
+                        resultsDiv.html(content); // Append the newly created content to the results div
+                    } else {
+                        resultsDiv.html('<p>No properties found that match your criteria.</p>');
+                    }
+    
+                    if (response.explanation) {
+                        resultsDiv.append(`<p><strong>Explanation:</strong> ${response.explanation}</p>`);
+                    }
+                },
+                error: function() {
+                    $('#results').html('<p>An error occurred while processing your request.</p>');
+                }
+            });
+        });
+    });
 </script>
-
+    
 </html>
