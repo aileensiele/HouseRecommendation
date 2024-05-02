@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<title>Quick Price Estimation</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Quick Price Estimation</h1>
+    <form action="quick_estimate" method="post">
+		<!-- Bedroom input -->
+		<div class="form-group">
+			<label for="bedrooms">Bedrooms:</label>
+			<input type="number" class="form-control" id="bedrooms" name="bedrooms" required min="1">
+		</div>
+		<!-- Bathroom input -->
+		<div class="form-group">
+			<label for="bathrooms">Bathrooms:</label>
+			<input type="number" class="form-control" id="bathrooms" name="bathrooms" required min="1">
+		</div>
+        <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" list="citylist" id="city" name="city" class="form-control" required>
+            <datalist id="citylist">
+                {% for city in cities %}
+                <option value="{{ city }}">
+                {% endfor %}
+            </datalist>
+        </div>
+        <button type="submit" class="btn btn-primary">Estimate Price</button>
+    </form>
+	<div id="results" class="mt-4">
+        <!-- Results will be displayed here !!! -->
+    </div>
+	
+</div>
+</body>
+
+<script>
+$(document).ready(function() {
+    $('form').submit(function(event) {
+        event.preventDefault(); // Stop the form from causing a page reload.
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(), // Send the form data to the server.
+            success: function(response) {
+                $('#results').html('Estimated Price: ' + response.estimated_price); // Update the results container with response.
+            },
+            error: function() {
+                $('#results').html('Failed to retrieve data.'); // Handle errors here
+            }
+        });
+    });
+});
+</script>
+
+</html>

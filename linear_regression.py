@@ -47,4 +47,4 @@ def train_and_predict_price(bedrooms, bathrooms, city, df):
     Total Predicted Price: ${predicted_price:,.2f}
     """
     print(explanation)
-    return predicted_price
+    return predicted_price, explanation

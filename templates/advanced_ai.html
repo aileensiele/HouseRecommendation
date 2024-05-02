@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<title>Advanced AI Feature Recommendation</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Advanced AI Feature Price Estimation and House Recommendation</h1>
+    <form id="advanced_ai" method="post">
+        <!-- Bedroom input -->
+		<div class="form-group">
+            <label for="bedrooms">Bedrooms:</label>
+            <input type="number" class="form-control" id="bedrooms" name="bedrooms" required min="1">
+        </div>
+        <!-- Bathroom input -->
+        <div class="form-group">
+            <label for="bathrooms">Bathrooms:</label>
+            <input type="number" class="form-control" id="bathrooms" name="bathrooms" required min="1">
+        </div>
+
+        <!-- City input -->
+         <div class="form-group">
+            <label for="city">City:</label>
+            <input type="text" list="citylist" id="city" name="city" class="form-control" required>
+            <datalist id="citylist">
+                {% for city in cities %}
+                <option value="{{ city }}">
+                {% endfor %}
+            </datalist>
+        </div>
+        <!-- House Type dropdown -->
+        <div class="form-group">
+            <label for="house_type">House Type:</label>
+            <select id="house_type" name="house_type" class="form-control">
+                <option value="Terraced">Terraced</option>
+                <option value="Land">Land</option>
+                <option value="Bungalow">Bungalow</option>
+                <option value="Detached">Detached</option>
+                <option value="Flat">Flat</option>
+                <option value="Park Home">Park Home</option>
+            </select>
+        </div>
+        <!-- House Condition dropdown -->
+        <div class="form-group">
+            <label for="house_condition">House Condition:</label>
+            <select id="house_condition" name="house_condition" class="form-control">
+                <option value="Outstanding">Outstanding</option>
+                <option value="Pleasant">Pleasant</option>
+                <option value="Alright">Alright</option>
+                <option value="Abysmal">Abysmal</option>
+                <option value="Rough">Rough</option>
+            </select>
+        </div>
+        <!-- Neighborhood Quality dropdown -->
+        <div class="form-group">
+            <label for="neighborhood_quality">Neighborhood Quality:</label>
+            <select id="neighborhood_quality" name="neighborhood_quality" class="form-control">
+                <option value="Outstanding">Outstanding</option>
+                <option value="Pleasant">Pleasant</option>
+                <option value="Alright">Alright</option>
+                <option value="Abysmal">Abysmal</option>
+                <option value="Rough">Rough</option>
+            </select>
+        </div>
+        <!-- Crime Rate dropdown -->
+        <div class="form-group">
+            <label for="crime_rate">Crime Rate:</label>
+            <select id="crime_rate" name="crime_rate" class="form-control">
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Very Low">Very Low</option>
+                <option value="Very High">Very High</option>
+                <option value="Non Existent">Non Existent</option>
+                <option value="Extreme">Extreme</option>
+            </select>
+        </div>
+        <!-- Garden Size input -->
+        <div class="form-group">
+            <label for="garden_size">Garden Size (sqm):</label>
+            <input type="number" id="garden_size" name="garden_size" class="form-control" min="0">
+        </div>
+        <!-- Budget -->
+        <div class="form-group">
+            <label for="budget">Budget Range:</label>
+            <input type="range" id="budget" name="budget" class="form-control" min="50000" max="1000000" step="5000" oninput="document.getElementById('budgetValue').textContent=this.value">
+            <span id="budgetValue">50000</span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+	<div id="results" class="mt-4">
+        <!-- Results will be displayed here -->
+    </div>
+</div>
+</body>
+
+<script>
+	$(document).ready(function() {
+		$('form').submit(function(event) {
+			event.preventDefault(); // Stop the form from causing a page reload.
+			$.ajax({
+				url: $(this).attr('action'),
+				type: 'POST',
+				data: $(this).serialize(), // Send the form data to the server.
+				success: function(response) {
+					$('#results').html('Estimated Price: ' + response.result); // Update the results container with response.
+				},
+				error: function() {
+					$('#results').html('Failed to retrieve data.'); // Handle errors here
+				}
+			});
+		});
+	});
+</script>
+
+</html>

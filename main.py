@@ -1,83 +1,58 @@
 from flask import Flask, request, render_template, jsonify
-import numpy as np
 import pandas as pd
-from random_forest import preprocess_data, train_model, predict_price  # Assuming these functions are in random_forest.py
 
 app = Flask(__name__)
 
+# Load the cities list when the application starts
+cities = []
+def load_cities():
+    global cities
+    df = pd.read_csv('updated_with_cities.csv')  # Load cities from CSV
+    cities = df['city'].unique().tolist()  # Update the global variable
+load_cities()
+
 @app.route('/')
 def index():
-    # Make sure the HTML file is in the 'templates' directory
-    return render_template('main.html')
+    return render_template('index.html')
 
-@app.route('/recommend', methods=['POST'])
-def recommend():
-    try:
-        # Extract data from form, using .get to avoid KeyError if keys don't exist
-        bedrooms = int(request.form.get('bedrooms', 0))
-        bathrooms = int(request.form.get('bathrooms', 0))
-        city = request.form.get('city', '')
-        house_type = request.form.get('house_type', '')
-        house_condition = request.form.get('house_condition', '')
-        neighborhood_quality = request.form.get('neighborhood_quality', '')
-        crime_rate = request.form.get('crime_rate', '')
-        garden_size = float(request.form.get('garden_size', 0))
-        budget = float(request.form.get('budget', 0))
+@app.route('/quick_estimate', methods=['GET', 'POST'])
+def quick_estimate():
+    if request.method == 'POST':
+        bedrooms = request.form.get('bedrooms')
+        bathrooms = request.form.get('bathrooms')
+        city = request.form.get('city')
+        estimated_price = calculate_quick_estimate(bedrooms, bathrooms, city)
+        return jsonify({'estimated_price': f"${estimated_price:.2f}"})
+    return render_template('quick_price.html', cities=cities)  # Ensure you have quick_price.html
 
-        # Create a dictionary with the input data
-        user_input = {
-            'bedrooms': bedrooms,
-            'bathrooms': bathrooms,
-            'city': city,
-            'house_type': house_type,
-            'house_condition': house_condition,
-            'neighborhood_quality': neighborhood_quality,
-            'crime_rate': crime_rate,
-            'garden_size': garden_size,
-            'budget': budget
-        }
+@app.route('/ai_recommender', methods=['GET', 'POST'])
+def ai_recommender():
+    if request.method == 'POST':
+        form_data = request.form
+        print(request.form)
+        recommended_properties = get_ai_recommendations(form_data)
+        return jsonify(recommended_properties)
+    return render_template('advanced_ai.html', cities=cities)  # Ensure you have advanced_ai.html
 
-        # Preprocess and predict
-        processed_input = preprocess_data(pd.DataFrame([user_input]))
-        # Check what you are getting
-        print(processed_input)
+@app.route('/manual_recommend', methods=['GET', 'POST'])
+def manual_recommend():
+    if request.method == 'POST':
+        form_data = request.form
+        recommendations = get_manual_recommendations(form_data)
+        return jsonify(recommendations)
+    return render_template('personal_recommendation.html', cities=cities)  # Ensure you have personal_recommendation.html
 
-        # Depending on button pressed, call different functionality
-        action = request.form.get('action', 'estimate')  # Default to 'estimate' if not found
-        if action == 'estimate':
-            predicted_price = predict_price(processed_input)
-            return jsonify({'predicted_price': f"${predicted_price:.2f}"})
-        elif action == 'recommend':
-            recommendations = recommend_houses(processed_input)  # Implement this
-            return jsonify(recommendations)
+def calculate_quick_estimate(bedrooms, bathrooms, city):
+    # replace with calling Dan's linear regression function
+    return 100000 + int(bedrooms) * 50000 + int(bathrooms) * 30000
 
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'error': str(e)})
-    
-    @app.route('/quick_estimate', methods=['POST'])
-	def quick_estimate():
-		# Extract and process data for quick price estimation
-		bedrooms = request.form['bedrooms']
-		bathrooms = request.form['bathrooms']
-		location = request.form['location']
-		
-		price = calculate_quick_estimate(bedrooms, bathrooms, location)
-		# explanation eg Given these number of bedrooms, bathrooms, and location, we have used a linear regression model to estimate ___ price. Because _____
-		return render_template('results.html', price=price, type='Quick Estimate')
+def get_ai_recommendations(data):
+    # replace with calling decision tree module
+    return {'result': 'AI-based recommendations based on the provided data'}
 
-	@app.route('/ai_recommender', methods=['POST'])
-	def ai_recommender():
-		# Process data for comprehensive AI-based recommendation
-		# Similar to quick_estimate, but more detailed
-		# will use decision tree here, to estimate using advanced features, which are ___ what the user entred
-		return render_template('ai_recommendations.html')
-
-	@app.route('/manual_recommend', methods=['POST'])
-	def manual_recommend():
-		# Manually process data based on if-else conditions
-		# since you desire a near personalized recommendation
-		return render_template('manual_recommendation.html')
+def get_manual_recommendations(data):
+    # replace with calling manual rec funct
+    return {'result': 'Manually curated recommendations based on rules'}
 
 if __name__ == '__main__':
     app.run(debug=True)
