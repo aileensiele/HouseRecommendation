@@ -83,6 +83,19 @@ def perform_clustering(df, categorical_cols):
     df['Cluster'] = pipeline_clustering.fit_predict(X_clustering)
     return pipeline_clustering
 
+def format_explanation(explanation):
+    """
+    Format the explanation dictionary into a more user-friendly text output, without '\n' and with proper new lines in code.
+    """
+    return (
+        f"Based on your preferences for {explanation['input_preferences']} with specific requirements on {explanation['strict_criteria']}, "
+        f"we looked for homes that match your lifestyle and budget. We first grouped homes into similar clusters to find communities that might appeal to you. "
+        f"Then, we focused on homes in your preferred city that fit your budget."
+        f"We prioritized homes that matched your type preference ('{explanation['house_type']}') and scored each option based on how well it met your needs. "
+        f"The best matches were sorted by how closely they met your preferences and their proximity to your budget limit, helping you find the best value within your range. "
+        f"The top recommendations were chosen based on these criteria, aiming to find the perfect fit for your needs within {explanation['city']}."
+    )
+
 def recommend_houses(df, user_preferences, pipeline_clustering):
     default_values = {
         'bedrooms': df['bedrooms'].median(),
@@ -100,10 +113,12 @@ def recommend_houses(df, user_preferences, pipeline_clustering):
     complete_preferences = {**default_values, **user_preferences}
     budget = complete_preferences.pop('budget')
 
+    # Transform user's preferences into the format used by the model
     user_df = pd.DataFrame([complete_preferences])
     user_df_transformed = pipeline_clustering['preprocessor'].transform(user_df)
     user_cluster = pipeline_clustering['cluster'].predict(user_df_transformed)[0]
 
+    # Build the query based on user cluster and budget
     query = (df['Cluster'] == user_cluster) & (df['price'] <= budget) & (df['city'] == complete_preferences['city'])
     for criterion in strict_criteria:
         if criterion in complete_preferences and complete_preferences[criterion] is not None:
@@ -112,19 +127,23 @@ def recommend_houses(df, user_preferences, pipeline_clustering):
     recommended_houses = df[query].copy()
     recommended_houses['score'] = (recommended_houses['house_type'] == complete_preferences['house_type']).astype(int)
 
+    explanation = {
+        'input_preferences': ', '.join(f"{k}: {v}" for k, v in user_preferences.items() if v is not None),
+        'strict_criteria': ', '.join(strict_criteria),
+        'house_type': complete_preferences['house_type'],
+        'city': complete_preferences['city']
+    }
+
     if recommended_houses.empty:
         recommended_houses = df[(df['price'] <= budget) & (df['city'] == complete_preferences['city'])].copy()
         recommended_houses['score'] = 0
 
     if not recommended_houses.empty:
-        # Calculate a new column 'budget_distance' to find houses closer to the upper budget limit
         recommended_houses['budget_distance'] = budget - recommended_houses['price']
         recommended_houses = recommended_houses.sort_values(by=['score', 'budget_distance'], ascending=[False, True]).head(10)
+        return recommended_houses[['bedrooms', 'bathrooms', 'house_type', 'city', 'price', 'score']], format_explanation(explanation)
     else:
-        return "No houses found in " + complete_preferences['city'] + " within your budget."
-
-    return recommended_houses[['bedrooms', 'bathrooms', 'house_type', 'city', 'price', 'score']]
-
+        return "No houses found in " + complete_preferences['city'] + " within your budget.", {}
 
 def main():
     df, categorical_cols = load_and_preprocess_data()
@@ -134,9 +153,11 @@ def main():
         'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
         'strict': ['city', 'bedrooms', 'bathrooms']
     }
-    recommended_houses = recommend_houses(df, user_preferences, pipeline_clustering)
+    recommended_houses, explanation = recommend_houses(df, user_preferences, pipeline_clustering)
     print("Recommended houses based on your preferences:")
     print(recommended_houses)
+    print("\n")
+    print(explanation)
 
 if __name__ == "__main__":
     main()
