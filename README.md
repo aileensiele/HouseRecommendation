@@ -39,7 +39,7 @@ To utilize the HouseRecommendation system, please follow the steps outlined belo
    - Navigate to the directory containing the cloned repository and start the application:
      ```
      cd HouseRecommendation
-     <!-- python main.py -->
+     python main.py
      ```
 
 4. **Interact with the Application:**
