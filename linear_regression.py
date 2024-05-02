@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
 
-def train_and_predict_price(bedrooms, bathrooms, city, df):
+def train_and_predict_price(bedrooms, bathrooms, city, df='updated_with_cities.csv'):
     # Load the datasets something like:
     # df = pd.read_csv("../updated_with_cities.csv")
 

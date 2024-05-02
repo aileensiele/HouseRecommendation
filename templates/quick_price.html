@@ -48,7 +48,7 @@ $(document).ready(function() {
             type: 'POST',
             data: $(this).serialize(), // Send the form data to the server.
             success: function(response) {
-                $('#results').html('Estimated Price: ' + response.estimated_price); // Update the results container with response.
+                $('#results').html('Estimated Price: ' + response.estimated_price + response.explanation); // Update the results container with response.
             },
             error: function() {
                 $('#results').html('Failed to retrieve data.'); // Handle errors here
