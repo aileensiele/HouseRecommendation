@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
+
 
 def load_and_preprocess_data():
     # Load the dataset
@@ -36,10 +37,25 @@ def load_and_preprocess_data():
 
     return df, categorical_cols
 
-def predict_prices(df, categorical_cols):
-    numerical_cols_regression = ['bedrooms', 'bathrooms', 'garden_size'] 
 
-    # ColumnTransformer for Regression
+def predict_price(df, categorical_cols, user_preferences):
+    # values for each feature
+    default_values = {
+        'bedrooms': df['bedrooms'].median(),
+        'bathrooms': df['bathrooms'].median(),
+        'garden_size': df['garden_size'].median(),
+        'house_type': df['house_type'].mode()[0],
+        'neighbourhood_quality': df['neighbourhood_quality'].mode()[0],
+        'house_condition': df['house_condition'].mode()[0],
+        'crime_rate': df['crime_rate'].mode()[0],
+        'city': df['city'].mode()[0]
+    }
+
+    # Merge user preferences with default values
+    complete_preferences = {**default_values, **user_preferences}
+
+    # Prepare the pipeline
+    numerical_cols_regression = ['bedrooms', 'bathrooms', 'garden_size']
     column_transformer_regression = ColumnTransformer(
         transformers=[
             ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols),
@@ -48,20 +64,32 @@ def predict_prices(df, categorical_cols):
         remainder='passthrough'
     )
 
-    # Regression Pipeline
-    pipeline_regression = Pipeline([
+    pipeline = Pipeline([
         ('preprocessor', column_transformer_regression),
-        ('regressor', DecisionTreeRegressor(random_state=42))
+        ('regressor', DecisionTreeRegressor(max_depth=5,random_state=42))
     ])
 
-    X_regression = df[categorical_cols + numerical_cols_regression]
+    # train the model
+    X = df[categorical_cols + numerical_cols_regression]
     y = df['price']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    pipeline.fit(X_train, y_train)
 
-    X_train, X_test, y_train, y_test = train_test_split(X_regression, y, test_size=0.2, random_state=42)
-    pipeline_regression.fit(X_train, y_train)
+    # predict using merged preferences
+    user_df = pd.DataFrame([complete_preferences])
+    predicted_price = pipeline.predict(user_df)
+    return predicted_price[0]
 
-    y_pred = pipeline_regression.predict(X_test)
-    print("Predicted Prices:", y_pred)
+    # # Perform cross-validation
+    # scores = cross_val_score(pipeline, X, y, cv=5, scoring='neg_mean_squared_error')
+    # rmse_scores = np.sqrt(-scores)
+
+    # # Train the model to predict using specific user preferences
+    # pipeline.fit(X, y)  # Train on the full dataset for actual prediction
+    # user_df = pd.DataFrame([complete_preferences])
+    # predicted_price = pipeline.predict(user_df)
+    # return predicted_price[0], rmse_scores.mean()
+
 
 def perform_clustering(df, categorical_cols):
     numerical_cols_clustering = ['bedrooms', 'bathrooms', 'garden_size', 'price']
@@ -147,7 +175,6 @@ def recommend_houses(df, user_preferences, pipeline_clustering):
 
 def main():
     df, categorical_cols = load_and_preprocess_data()
-    predict_prices(df, categorical_cols)
     pipeline_clustering = perform_clustering(df, categorical_cols)
     user_preferences = {
         'bedrooms': 3,
@@ -165,11 +192,19 @@ def main():
     #     'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
     #     'strict': ['city', 'bedrooms', 'bathrooms']
     # }
+    price_estimate = predict_price(df, categorical_cols, user_preferences)
+    formatted_price = f"£{price_estimate:,.2f}"  # Formatting to two decimal places with comma as a thousand separator
+    print(f"Estimated price for specified house: {formatted_price}")
+    # price_estimate, average_rmse = predict_price(df, categorical_cols, user_preferences)
+    # print(f"Estimated price for specified house:f £{price_estimate:,.2f}")
+    # print(f"Average RMSE from cross-validation: £{average_rmse:,.2f}")
+
     recommended_houses, explanation = recommend_houses(df, user_preferences, pipeline_clustering)
     print("Recommended houses based on your preferences:")
     print(recommended_houses)
     print("\n")
     print(explanation)
+
 
 if __name__ == "__main__":
     main()

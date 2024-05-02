@@ -9,7 +9,7 @@ HouseRecommendation is an advanced analytical tool designed to streamline the ho
 
 - **Comprehensive Price Estimation using Decision Trees:** The Decision Tree algorithm is utilized to analyze all available house features to estimate costs accurately. This method facilitates a thorough evaluation of properties, ensuring that all relevant characteristics such as location, neighboorhood quality, and house condition are considered.
 
-- **Advanced Clustering for Customized Recommendations:** Through the clustering method, our system groups houses into distinct categories based on features specified by users. This approach tailors the search to user preferences and prioritizes these clusters according to the user's budget as well as any other preferences that they indicate as they input desired features.
+- **Advanced Clustering for Customized Recommendations:** Our model uses the clustering mechanism (KMeans) that groups the houses into clusters based on their features including 'price'. This model is trained to find patterns or groups of similar houses in the dataset.Through the clustering method, our system groups houses into distinct categories based on features specified by users. This approach tailors the search to user preferences and prioritizes these clusters according to the user's budget as well as any other preferences that they indicate as they input desired features.
 
 - **User-Centric Scoring System:** After identifying clusters, our system assigns a score to each house based on its congruence with the user's specified needs. This scoring mechanism prioritizes homes that best match the user’s preferences, offering a ranked list of recommendations that maximize satisfaction.
 
