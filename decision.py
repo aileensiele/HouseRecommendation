@@ -88,9 +88,9 @@ def format_explanation(explanation):
     Format the explanation dictionary into a more user-friendly text output, without '\n' and with proper new lines in code.
     """
     return (
-        f"Based on your preferences for {explanation['input_preferences']} with specific requirements on {explanation['strict_criteria']}, "
+        f"Based on your preferences for {explanation['input_preferences']}, with specific requirements on {explanation['strict_criteria']}, "
         f"we looked for homes that match your lifestyle and budget. We first grouped homes into similar clusters to find communities that might appeal to you. "
-        f"Then, we focused on homes in your preferred city that fit your budget."
+        f"Then, we focused on homes in your preferred city that fit your budget. "
         f"We prioritized homes that matched your type preference ('{explanation['house_type']}') and scored each option based on how well it met your needs. "
         f"The best matches were sorted by how closely they met your preferences and their proximity to your budget limit, helping you find the best value within your range. "
         f"The top recommendations were chosen based on these criteria, aiming to find the perfect fit for your needs within {explanation['city']}."
@@ -150,9 +150,21 @@ def main():
     predict_prices(df, categorical_cols)
     pipeline_clustering = perform_clustering(df, categorical_cols)
     user_preferences = {
-        'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
-        'strict': ['city', 'bedrooms', 'bathrooms']
+        'bedrooms': 3,
+        'bathrooms': 2,
+        'city': 'London',
+        'house_type': 'Detached',
+        'budget': 500000,
+        'neighbourhood_quality': 'Pleasant',
+        'house_condition': 'Pleasant',
+        'crime_rate': 'Low',
+        'strict': ['city', 'neighbourhood_quality', 'crime_rate']
     }
+
+    # user_preferences = {
+    #     'bedrooms': 4, 'bathrooms': 2, 'city': 'London', 'house_type': 'Detached', 'budget': 200000,
+    #     'strict': ['city', 'bedrooms', 'bathrooms']
+    # }
     recommended_houses, explanation = recommend_houses(df, user_preferences, pipeline_clustering)
     print("Recommended houses based on your preferences:")
     print(recommended_houses)
