@@ -14,13 +14,28 @@
     <form id="personal_recommendation" method="post">
 		<!--Personalized user input !!-->
         <div class="form-group">
-            <label for="kids">Kids (Yes/No):</label>
-            <select class="form-control" id="kids" name="kids">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
+            <label for="employment">Employment Status:</label>
+            <select class="form-control" id="employment" name="employment">
+                <option value="Employed">Employed</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Student">Student</option>
+                <option value="Retired">Retired</option>
             </select>
         </div>
-
+        <div class="form-group">
+            <label for="marital_status">Marital Status:</label>
+            <select class="form-control" id="marital_status" name="marital_status">
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="children">Kids (Yes/No):</label>
+            <select class="form-control" id="children" name="children">
+                <option value="Has Kids">Yes</option>
+                <option value="No Kids">No</option>
+            </select>
+        </div>
 		<div class="form-group">
             <label for="bedrooms">Bedrooms:</label>
             <input type="number" class="form-control" id="bedrooms" name="bedrooms" required min="1">
@@ -95,9 +110,12 @@
         </div>
         <!-- Budget -->
         <div class="form-group">
-            <label for="budget">Budget Range:</label>
-            <input type="range" id="budget" name="budget" class="form-control" min="50000" max="1000000" step="5000" oninput="document.getElementById('budgetValue').textContent=this.value">
-            <span id="budgetValue">50000</span>
+            <label for="min_price">Minimum Price ($):</label>
+            <input type="number" class="form-control" id="min_price" name="min_price" required min="1">
+        </div>
+        <div class="form-group">
+            <label for="max_price">Maximum Price ($):</label>
+            <input type="number" class="form-control" id="max_price" name="max_price" required min="1">
         </div>
 		<button type="submit" class="btn btn-primary">Get Recommendation</button>
     </form>

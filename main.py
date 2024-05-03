@@ -3,6 +3,7 @@ import pandas as pd
 # import functs from decision to apply in this model!
 from decision import load_and_preprocess_data, perform_clustering, recommend_houses
 from linear_regression import train_and_predict_price
+from manual_recommendation import filter_houses
 
 
 app = Flask(__name__)
@@ -47,27 +48,40 @@ def ai_recommender():
         recommended_properties = get_ai_recommendations(form_data)
     
         return jsonify(recommended_properties)
-    return render_template('advanced_ai.html', cities=cities)  # Ensure you have advanced_ai.html
+    return render_template('advanced_ai.html', cities=cities)  
 
 @app.route('/manual_recommend', methods=['GET', 'POST'])
 def manual_recommend():
     if request.method == 'POST':
-        form_data = request.form
-        recommendations = get_manual_recommendations(form_data)
-        return jsonify(recommendations)
-    return render_template('personal_recommendation.html', cities=cities)  # Ensure you have personal_recommendation.html
+        # Collect form data
+        user_profile = {
+            'employment': request.form.get('employment'), 
+            'marital_status': request.form.get('marital_status'),  
+            'children': request.form.get('children')  
+        }
+        base_preferences = {
+            'min_price': float(request.form.get('min_price')),
+            'max_price': float(request.form.get('max_price')),
+            'bedrooms': int(request.form.get('bedrooms')),
+            'bathrooms': int(request.form.get('bathrooms')),
+            'neighborhood_quality': request.form.get('neighborhood_quality')
+        }
+        
+        # Load dataset and filter houses based on user preferences
+        df = pd.read_csv('updated_with_cities.csv')  # Load the dataset if not already loaded
+        filtered_houses = filter_houses(user_profile, base_preferences)
+        
+        # Convert the results to a JSON-friendly format if not empty
+        if not filtered_houses.empty:
+            results = filtered_houses.to_dict(orient='records')
+            print(results)
+            return jsonify({'result': results})
+        else:
+            return jsonify({'error': 'No matching houses found.'})
 
-# def calculate_quick_estimate(form_data):
-#     # replace with calling Dan's linear regression function
-#     user_preferences = {
-#         'bedrooms': int(form_data['bedrooms']),
-#         'bathrooms': int(form_data['bathrooms']),
-#         'city': form_data['city'],
-#         }
-#     predicted_price, explanation = train_and_predict_price()
-#     return {'estimate': predicted_price,
-#             'explanation': explanation
-#         }
+    # Load initial page
+    return render_template('personal_recommendation.html', cities=cities)
+
 
 def get_ai_recommendations(form_data):
     # replace with calling decision tree module
@@ -97,11 +111,6 @@ def get_ai_recommendations(form_data):
             'recommended_properties': results,
             'explanation': explanation
         }
-
-def get_manual_recommendations(data):
-    # replace with calling manual rec funct
-    
-    return {'result': 'Manually curated recommendations based on rules'}
 
 if __name__ == '__main__':
     app.run(debug=True)
