@@ -4,7 +4,7 @@ This is our Final Project for CPSC 458: Automated Decision Systems
 
 ## Members
 Daniel Metaferia ()
-Vimbisai Basvi ()
+Vimbisai Basvi (vmb42)
 Aileen Siele (acs274)
 ## Overview
 Our project is an advanced analytical tool designed to streamline the home-buying process by leveraging cutting-edge machine learning algorithms. This system offers precise house price estimations and personalized recommendations. Initially we experimented with various models like Random Forest and Decision Trees, and we ended up focusing on using Linear Regression and clustering (KMeans) for the final implementation due to their enhanced predictive performance.
@@ -18,7 +18,7 @@ Our project is an advanced analytical tool designed to streamline the home-buyin
 Our project uses a synthetic dataset of houses based in the UK and initially, it comprised only the longitude and latitude in addition to the other columns. We had to use the Geocoding API to convert each of the 30,000 houses' latitudes and longitudes to their respective locations. Using this information, we generated a 'cities' column. This data enhancement was pivotal for our subsequent analyses.
 
 ## Challenges Faced
-- **Data Synthesis and Enrichment:** Transforming a basic dataset into a comprehensive one required significant effort, particularly in generating usable city information from geographic coordinates.
+- **Data Synthesis and Enrichment:** Transforming a basic dataset into a comprehensive one required significant effort, particularly in generating usable city information from geographic coordinates we can find that process in city.ipynb which took a significant portion of time to do so.
 - **Model Exploration and Optimization:** We experimented with four different machine learning models. However, due to unsatisfactory prediction rates, we opted to proceed with only two—Linear Regression and Clustering. Despite attempts to integrate categorical data via one-hot encoding, this method proved ineffectual, leading us to focus solely on numerical data especially for linear regression.
 - **Learning Curve:** Our journey into AI was fueled by self-learning, progressing from one resource to another. This exploratory process is detailed in our Jupyter notebooks, which details our progression from having limited knowledge of machine learning to developing a functional predictive system.
 
