@@ -15,7 +15,7 @@ def filter_houses(user_profile, base_preferences):
     df = pd.read_csv("updated_with_cities.csv")
     # Map neighborhood quality to numerical values for sorting
     quality_mapping = {'Outstanding': 5, 'Pleasant': 4, 'Alright': 3, 'Rough': 2, 'Abysmal': 1}
-    df['quality_score'] = df['neighborhood_quality'].map(quality_mapping)
+    df['quality_score'] = df['neighbourhood_quality'].map(quality_mapping)
 
     # Start explanation
     explanation_parts = []
@@ -49,11 +49,11 @@ def filter_houses(user_profile, base_preferences):
         "Price within budget: $" + filtered_houses['price'].astype(str) + ". " +
         "Has at least " + str(base_preferences['bedrooms']) + " bedrooms and " +
         str(base_preferences['bathrooms']) + " bathrooms. " +
-        "Neighborhood quality is " + filtered_houses['neighborhood_quality'] + ". " +
+        "Neighborhood quality is " + filtered_houses['neighbourhood_quality'] + ". " +
         " ".join(explanation_parts)
     )
 
-    return filtered_houses[['price', 'bedrooms', 'bathrooms', 'neighborhood_quality', 'explanation']]
+    return filtered_houses[['price', 'bedrooms', 'bathrooms', 'neighbourhood_quality', 'explanation']]
 
 # Example usage of the function
 # Define a df (mock or actual DataFrame), user profile, and base preferences before using this function.

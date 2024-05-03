@@ -70,7 +70,7 @@ def manual_recommend():
         # Load dataset and filter houses based on user preferences
         df = pd.read_csv('updated_with_cities.csv')  # Load the dataset if not already loaded
         filtered_houses = filter_houses(user_profile, base_preferences)
-        
+        print(filtered_houses)
         # Convert the results to a JSON-friendly format if not empty
         if not filtered_houses.empty:
             results = filtered_houses.to_dict(orient='records')
