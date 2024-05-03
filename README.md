@@ -3,7 +3,7 @@
 This is our Final Project for CPSC 458: Automated Decision Systems
 
 ## Members
-Daniel Metaferia ()
+Daniel Metaferia (dym7)
 Vimbisai Basvi (vmb42)
 Aileen Siele (acs274)
 ## Overview
