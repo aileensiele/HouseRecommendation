@@ -7,6 +7,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
 
+# implementation of the prediction using Decision Tree and the house recommendation using Cluster Method
 
 def load_and_preprocess_data():
     # Load the dataset

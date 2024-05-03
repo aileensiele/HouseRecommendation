@@ -7,12 +7,12 @@ Daniel Metaferia (dym7)
 Vimbisai Basvi (vmb42)
 Aileen Siele (acs274)
 ## Overview
-Our project is an advanced analytical tool designed to streamline the home-buying process by leveraging cutting-edge machine learning algorithms. This system offers precise house price estimations and personalized recommendations. Initially we experimented with various models like Random Forest and Decision Trees, and we ended up focusing on using Linear Regression and clustering (KMeans) for the final implementation due to their enhanced predictive performance.
+Our project is an advanced analytical tool designed to streamline the home-buying process by leveraging cutting-edge machine learning algorithms. This system offers precise house price estimations and personalized recommendations. Initially we experimented with various models like Random Forest and Decision Trees, and we ended up focusing on using Linear Regression and clustering (KMeans) for the final implementation due to their enhanced predictive performance. Our implementation for price prediction using Decision Trees still exists in the decision.py file. 
 
 ### Features
 - **Price Estimation with Linear Regression:** Employs Linear Regression to estimate house prices effectively, emphasizing the impact of bedrooms and bathrooms on pricing.
   
-- **Advanced Clustering for Customized Recommendations:** Utilizes KMeans clustering to group houses based on shared features, aligning recommendations with user preferences and budget.
+- **Advanced Clustering for Customized Recommendations:** Utilizes KMeans clustering to group houses based on shared features, aligning recommendations with user preferences and budget.(implementation in decision.py file)
 
 ## Data Processing
 Our project uses a synthetic dataset of houses based in the UK and initially, it comprised only the longitude and latitude in addition to the other columns. We had to use the Geocoding API to convert each of the 30,000 houses' latitudes and longitudes to their respective locations. Using this information, we generated a 'cities' column. This data enhancement was pivotal for our subsequent analyses.
